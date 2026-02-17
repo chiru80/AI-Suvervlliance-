@@ -1,0 +1,224 @@
+<script>
+
+async function updateStatus(){
+
+    const res = await fetch('/status');
+    const data = await res.json();
+
+    document.getElementById("intruders").innerText = data.intruders;
+    document.getElementById("lastDetection").innerText = data.last_detection;
+    document.getElementById("emailStatus").innerText = data.email_status;
+}
+
+setInterval(updateStatus,2000);
+
+</script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Surveillance Control Center</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--bg:#020617;
+--panel:#0f172a;
+--card:#111827;
+--accent:#22c55e;
+--border:#1f2937;
+--text:#e5e7eb;
+--danger:#ef4444;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#020617,#020617 60%,#020617);
+color:var(--text);
+}
+
+/* HEADER */
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px 40px;
+background:rgba(15,23,42,.8);
+border-bottom:1px solid var(--border);
+backdrop-filter:blur(8px);
+}
+
+.logo{
+font-size:22px;
+font-weight:700;
+}
+
+.live{
+background:rgba(34,197,94,.15);
+color:var(--accent);
+padding:6px 14px;
+border-radius:999px;
+font-weight:600;
+}
+
+/* LAYOUT */
+
+.container{
+display:grid;
+grid-template-columns:3fr 1.2fr;
+gap:25px;
+padding:30px 40px;
+}
+
+/* VIDEO */
+
+.video-card{
+background:var(--panel);
+padding:18px;
+border-radius:18px;
+border:1px solid var(--border);
+box-shadow:0 20px 40px rgba(0,0,0,.4);
+}
+
+.video-box{
+border-radius:14px;
+overflow:hidden;
+border:3px solid var(--accent);
+}
+
+.video-box img{
+width:100%;
+display:block;
+}
+
+/* SIDE */
+
+.side{
+display:flex;
+flex-direction:column;
+gap:18px;
+}
+
+.card{
+background:rgba(17,24,39,.7);
+border:1px solid var(--border);
+padding:20px;
+border-radius:16px;
+transition:.25s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.metric{
+font-size:26px;
+font-weight:700;
+margin-top:6px;
+}
+
+.label{
+color:#94a3b8;
+}
+
+/* ALERT */
+
+.alert{
+background:rgba(239,68,68,.12);
+border:1px solid rgba(239,68,68,.4);
+color:var(--danger);
+font-weight:700;
+text-align:center;
+padding:14px;
+border-radius:12px;
+animation:pulse 1.2s infinite;
+}
+
+@keyframes pulse{
+0%{opacity:1}
+50%{opacity:.5}
+100%{opacity:1}
+}
+
+/* MOBILE */
+
+@media(max-width:1100px){
+.container{
+grid-template-columns:1fr;
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<div class="logo">🛡 AI Surveillance</div>
+<div class="live">● LIVE</div>
+</div>
+
+<div class="container">
+
+<div class="video-card">
+<h3 style="margin-bottom:10px;">Real-Time Monitoring</h3>
+<div class="video-box">
+<img src="/video">
+</div>
+</div>
+
+<div class="side">
+
+<div class="alert">
+⚠ AI Intrusion Detection Enabled
+</div>
+
+<div class="card">
+<div class="label">Detection Mode</div>
+<div class="metric">Person Tracking</div>
+</div>
+
+<div class="card">
+<div class="label">Evidence Capture</div>
+<div class="metric">Auto Snapshot</div>
+</div>
+
+<div class="card">
+<div class="label">AI Model</div>
+<div class="metric">YOLOv8 Neural Engine</div>
+</div>
+
+<div class="card">
+<div class="label">Intruders Detected</div>
+<div class="metric" id="intruders">0</div>
+</div>
+
+<div class="card">
+<div class="label">Last Detection</div>
+<div class="metric" id="lastDetection">None</div>
+</div>
+
+<div class="card">
+<div class="label">Email Status</div>
+<div class="metric" id="emailStatus">Waiting...</div>
+</div>
+
+
+</div>
+</div>
+
+</body>
+</html>

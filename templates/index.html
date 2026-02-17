@@ -1,224 +1,408 @@
-<script>
-
-async function updateStatus(){
-
-    const res = await fetch('/status');
-    const data = await res.json();
-
-    document.getElementById("intruders").innerText = data.intruders;
-    document.getElementById("lastDetection").innerText = data.last_detection;
-    document.getElementById("emailStatus").innerText = data.email_status;
-}
-
-setInterval(updateStatus,2000);
-
-</script>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Surveillance Control Center</title>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    integrity="sha512-SnH5WK+bZxgPHs44uWix+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkR4j8R2R5xwG7A6Q8f2R5f5r5JrY2+0N2+Q=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
 
-<title>AI Surveillance Control Center</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --panel: #0b1220;
+      --card: #111a2f;
+      --border: #20304f;
+      --text: #e2e8f0;
+      --muted: #9db0c9;
+      --cyan: #22d3ee;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --shadow: 0 20px 50px rgba(2, 6, 23, 0.55);
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;700&display=swap" rel="stylesheet">
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: '"'"'Inter'"'"', sans-serif;
+    }
 
-<style>
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 85% 5%, rgba(34, 211, 238, 0.12), transparent 34%),
+        radial-gradient(circle at 10% 95%, rgba(52, 211, 153, 0.12), transparent 38%),
+        linear-gradient(165deg, #020617 0%, #020817 65%, #020b1f 100%);
+      color: var(--text);
+      padding: 22px;
+    }
 
-:root{
---bg:#020617;
---panel:#0f172a;
---card:#111827;
---accent:#22c55e;
---border:#1f2937;
---text:#e5e7eb;
---danger:#ef4444;
-}
+    .dashboard {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: rgba(11, 18, 32, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter',sans-serif;
-}
+    .header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
 
-body{
-background:linear-gradient(135deg,#020617,#020617 60%,#020617);
-color:var(--text);
-}
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
 
-/* HEADER */
+    .title i {
+      font-size: 1.2rem;
+      color: var(--cyan);
+      background: rgba(34, 211, 238, 0.14);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+    }
 
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:18px 40px;
-background:rgba(15,23,42,.8);
-border-bottom:1px solid var(--border);
-backdrop-filter:blur(8px);
-}
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-.logo{
-font-size:22px;
-font-weight:700;
-}
+    .chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      border: 1px solid;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
 
-.live{
-background:rgba(34,197,94,.15);
-color:var(--accent);
-padding:6px 14px;
-border-radius:999px;
-font-weight:600;
-}
+    .chip-live {
+      color: var(--green);
+      border-color: rgba(52, 211, 153, 0.42);
+      background: rgba(52, 211, 153, 0.12);
+    }
 
-/* LAYOUT */
+    .chip-time {
+      color: var(--muted);
+      border-color: rgba(157, 176, 201, 0.35);
+      background: rgba(157, 176, 201, 0.08);
+      font-variant-numeric: tabular-nums;
+    }
 
-.container{
-display:grid;
-grid-template-columns:3fr 1.2fr;
-gap:25px;
-padding:30px 40px;
-}
+    .content {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+    }
 
-/* VIDEO */
+    .panel {
+      background: rgba(17, 26, 47, 0.82);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
 
-.video-card{
-background:var(--panel);
-padding:18px;
-border-radius:18px;
-border:1px solid var(--border);
-box-shadow:0 20px 40px rgba(0,0,0,.4);
-}
+    .panel-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
 
-.video-box{
-border-radius:14px;
-overflow:hidden;
-border:3px solid var(--accent);
-}
+    .panel-header strong {
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+    }
 
-.video-box img{
-width:100%;
-display:block;
-}
+    .video-wrap {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #050b18;
+    }
 
-/* SIDE */
+    .video-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
 
-.side{
-display:flex;
-flex-direction:column;
-gap:18px;
-}
+    .overlay-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      color: var(--amber);
+      background: rgba(15, 23, 42, 0.78);
+      border: 1px solid rgba(251, 191, 36, 0.36);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      backdrop-filter: blur(4px);
+    }
 
-.card{
-background:rgba(17,24,39,.7);
-border:1px solid var(--border);
-padding:20px;
-border-radius:16px;
-transition:.25s;
-}
+    .side {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-content: start;
+    }
 
-.card:hover{
-transform:translateY(-5px);
-}
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
 
-.metric{
-font-size:26px;
-font-weight:700;
-margin-top:6px;
-}
+    .card {
+      background: rgba(10, 18, 34, 0.82);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
 
-.label{
-color:#94a3b8;
-}
+    .card-label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-/* ALERT */
+    .card-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      line-height: 1.15;
+      font-variant-numeric: tabular-nums;
+    }
 
-.alert{
-background:rgba(239,68,68,.12);
-border:1px solid rgba(239,68,68,.4);
-color:var(--danger);
-font-weight:700;
-text-align:center;
-padding:14px;
-border-radius:12px;
-animation:pulse 1.2s infinite;
-}
+    .wide {
+      grid-column: 1 / -1;
+    }
 
-@keyframes pulse{
-0%{opacity:1}
-50%{opacity:.5}
-100%{opacity:1}
-}
+    .email-ok {
+      color: var(--green);
+    }
 
-/* MOBILE */
+    .email-fail {
+      color: var(--red);
+    }
 
-@media(max-width:1100px){
-.container{
-grid-template-columns:1fr;
-}
-}
+    .email-wait {
+      color: var(--amber);
+    }
 
-</style>
+    .alert {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fecaca;
+      background: rgba(248, 113, 113, 0.12);
+      border: 1px solid rgba(248, 113, 113, 0.38);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.87rem;
+      border-top: 1px dashed rgba(157, 176, 201, 0.2);
+      padding-top: 8px;
+    }
+
+    .tag {
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 5px 9px;
+      letter-spacing: 0.1px;
+    }
+
+    .tag-safe {
+      color: var(--green);
+      background: rgba(52, 211, 153, 0.14);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+    }
+
+    .tag-watch {
+      color: var(--amber);
+      background: rgba(251, 191, 36, 0.14);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+    }
+
+    @media (max-width: 1100px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        padding: 12px;
+      }
+
+      .content,
+      .header {
+        padding: 14px;
+      }
+
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="dashboard">
+    <header class="header">
+      <div class="title">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>AI Surveillance Control Center</span>
+      </div>
+      <div class="header-right">
+        <div class="chip chip-live"><i class="fa-solid fa-circle"></i> Live Monitoring</div>
+        <div class="chip chip-time"><i class="fa-regular fa-clock"></i> <span id="clock">--:--:--</span></div>
+      </div>
+    </header>
 
-<div class="header">
-<div class="logo">🛡 AI Surveillance</div>
-<div class="live">● LIVE</div>
-</div>
+    <section class="content">
+      <article class="panel">
+        <div class="panel-header">
+          <strong>Real-Time Camera Feed</strong>
+          <span><i class="fa-solid fa-video"></i> Streaming via Flask</span>
+        </div>
+        <div class="video-wrap">
+          <img src="/video" alt="Live AI surveillance feed" />
+          <div class="overlay-badge"><i class="fa-solid fa-crosshairs"></i> YOLOv8 Detection</div>
+        </div>
+      </article>
 
-<div class="container">
+      <aside class="side">
+        <div class="alert">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Intrusion detection, evidence capture, and email alerting are active.
+        </div>
 
-<div class="video-card">
-<h3 style="margin-bottom:10px;">Real-Time Monitoring</h3>
-<div class="video-box">
-<img src="/video">
-</div>
-</div>
+        <div class="status-grid">
+          <div class="card">
+            <div class="card-label"><i class="fa-solid fa-user-secret"></i> Intruders Detected</div>
+            <div class="card-value" id="intruders">0</div>
+          </div>
 
-<div class="side">
+          <div class="card">
+            <div class="card-label"><i class="fa-solid fa-bell"></i> Email Status</div>
+            <div class="card-value email-wait" id="emailStatus">Waiting...</div>
+          </div>
 
-<div class="alert">
-⚠ AI Intrusion Detection Enabled
-</div>
+          <div class="card wide">
+            <div class="card-label"><i class="fa-regular fa-clock"></i> Last Detection</div>
+            <div class="card-value" id="lastDetection">None</div>
+          </div>
 
-<div class="card">
-<div class="label">Detection Mode</div>
-<div class="metric">Person Tracking</div>
-</div>
+          <div class="card wide">
+            <div class="card-label"><i class="fa-solid fa-microchip"></i> System Overview</div>
+            <div class="legend">
+              <div class="legend-item"><span>Model Engine</span><strong>YOLOv8</strong></div>
+              <div class="legend-item"><span>Detection Class</span><strong>Human Presence</strong></div>
+              <div class="legend-item"><span>Alert Pipeline</span><span class="tag tag-watch">Armed</span></div>
+              <div class="legend-item"><span>Camera Health</span><span class="tag tag-safe">Online</span></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
 
-<div class="card">
-<div class="label">Evidence Capture</div>
-<div class="metric">Auto Snapshot</div>
-</div>
+  <script>
+    function setEmailStatusClass(value) {
+      const email = document.getElementById('"'"'emailStatus'"'"');
+      email.classList.remove('"'"'email-ok'"'"', '"'"'email-fail'"'"', '"'"'email-wait'"'"');
 
-<div class="card">
-<div class="label">AI Model</div>
-<div class="metric">YOLOv8 Neural Engine</div>
-</div>
+      if (value.includes('"'"'Sent'"'"')) {
+        email.classList.add('"'"'email-ok'"'"');
+      } else if (value.includes('"'"'Failed'"'"')) {
+        email.classList.add('"'"'email-fail'"'"');
+      } else {
+        email.classList.add('"'"'email-wait'"'"');
+      }
+    }
 
-<div class="card">
-<div class="label">Intruders Detected</div>
-<div class="metric" id="intruders">0</div>
-</div>
+    async function updateStatus() {
+      try {
+        const res = await fetch('"'"'/status'"'"');
+        const data = await res.json();
 
-<div class="card">
-<div class="label">Last Detection</div>
-<div class="metric" id="lastDetection">None</div>
-</div>
+        document.getElementById('"'"'intruders'"'"').innerText = data.intruders;
+        document.getElementById('"'"'lastDetection'"'"').innerText = data.last_detection;
+        document.getElementById('"'"'emailStatus'"'"').innerText = data.email_status;
+        setEmailStatusClass(data.email_status);
+      } catch (err) {
+        document.getElementById('"'"'emailStatus'"'"').innerText = '"'"'⚠ Offline'"'"';
+        setEmailStatusClass('"'"'Failed'"'"');
+      }
+    }
 
-<div class="card">
-<div class="label">Email Status</div>
-<div class="metric" id="emailStatus">Waiting...</div>
-</div>
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('"'"'clock'"'"').innerText = now.toLocaleTimeString();
+    }
 
+    updateStatus();
+    updateClock();
 
-</div>
-</div>
-
+    setInterval(updateStatus, 2000);
+    setInterval(updateClock, 1000);
+  </script>
 </body>
 </html>
+EOF'

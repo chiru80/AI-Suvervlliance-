@@ -19,3 +19,6 @@ This project implements a real-time AI surveillance system capable of detecting 
 ## How to Run
 pip install -r requirements.txt
 python app.py
+
+## Prompt Template
+- See `enhanced_prompt.md` for a structured prompt you can use when asking an AI to build an app from this (or any) GitHub repository.
